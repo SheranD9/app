@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/the-new-css-reset/css/reset.min.css"
+    />
+    <title>Youtube API</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        padding: 20px;
+      }
+
+      #player {
+        display: block;
+        margin: 20px auto;
+      }
+
+      nav {
+        margin: 0 auto 0 auto;
+        width: 500px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      nav ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+
+      nav li,
+      nav label,
+      nav form {
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      form#ytSearchForm {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      input[type="search"] {
+        padding: 8px 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 250px;
+      }
+
+      button#searchBtn {
+        padding: 8px 16px;
+        font-size: 16px;
+        background-color: #0073e6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      button#searchBtn:hover {
+        background-color: #005bb5;
+      }
+
+      select#MovieId,
+      select.searchlist {
+        padding: 8px 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: white;
+      }
+
+      .searchlist {
+        margin-top: 10px;
+      }
+
+      #volume {
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      form#doSpeed label {
+        margin-left: 5px;
+        margin-right: 10px;
+      }
+
+      #progressContainer {
+        margin-top: 10px;
+        width: 640px; /* Match the video's width */
+        margin-left: auto;
+        margin-right: auto; /* Center the progress bar */
+      }
+
+      #progressBar {
+        width: 100%; /* Ensure it spans the full width of the container */
+        background-color: darkgrey;
+        border-radius: 7px;
+        height: 10px;
+      }
+
+      #recommendedVideos {
+        margin-top: 20px;
+      }
+
+      #videoList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      #searchResults {
+        margin-top: 20px;
+      }
+
+      #resultsList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form>
+      <input type="search" id="ytSearch" value="TRiDENT" />
+      <button id="searchBtn">検索</button>
+    </form>
+
+    <div id="player"></div>
+
+    <div id="progressContainer" style="margin-top: 20px">
+      <input
+        type="range"
+        id="progressBar"
+        min="0"
+        max="100"
+        value="0"
+        style="width: 100%"
+      />
+    </div>
+
+    <nav>
+      <ul>
+        <li id="doplay">再生</li>
+        <li id="dostop">停止</li>
+        <li id="dopause">一時停止</li>
+        <li id="mute">ミュート</li>
+        <li id="do10sNext">10秒先へ</li>
+        <li id="do10sPrev">10秒戻る</li>
+        <label>
+          ボリューム<input
+            type="range"
+            min="0"
+            max="100"
+            name="volume"
+            id="volume"
+            value="50"
+          />
+          <span id="volumeNum"></span>
+        </label>
+        <li>
+          <select id="MovieId" class="ytMovie" name="ytMovie">
+            <option id="selected" selected>選択してください。</option>
+            <option value="bjN-3EyXNyE">TRiDENT『Alive』MV</option>
+            <option value="We__CnrYa9U">TRiDENT『DISTINATION』</option>
+            <option value="I6ld4ecEp7s">TRiDENT『IMAGINATION』MV</option>
+            <option value="azQVVhMUz58">TRiDENT『Continue』MV</option>
+          </select>
+        </li>
+        <li>
+          <form id="doSpeed">
+            <input type="radio" id="mslow" name="speed" value="0.25" />
+            <label for="mslow">0.25</label>
+            <input type="radio" id="slow" name="speed" value="0.5" />
+            <label for="slow">0.5</label>
+            <input type="radio" id="normal" name="speed" value="1.0" checked />
+            <label for="normal">1</label>
+            <input type="radio" id="hspeed" name="speed" value="1.5" />
+            <label for="hspeed">1.5</label>
+            <input type="radio" id="mhspeed" name="speed" value="2" />
+            <label for="mhspeed">2</label>
+          </form>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- <div id="recommendedVideos" style="margin-top: 20px">
+      <h3>Recommended Videos</h3>
+      <div
+        id="videoList"
+        style="display: flex; flex-wrap: wrap; gap: 10px"
+      ></div>
+    </div> -->
+
+    <div id="searchResults" style="margin-top: 20px">
+      <h3 class="search__heading"></h3>
+      <div
+        id="resultsList"
+        style="display: flex; flex-wrap: wrap; gap: 10px"
+      ></div>
+    </div>
+
+    <!-- <select class="searchlist"></select> -->
+
+    <script>
+      // Dynamically load the YouTube IFrame Player API script
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // Store the YouTube player instance and current video ID
+      let player;
+      let youtubeId = "UP1zTP5qcfw";
+
+      // Called automatically when the YouTube IFrame API is ready
+      function onYouTubeIframeAPIReady() {
+        // Create the YouTube player and embed it in the #player div
+        player = new YT.Player("player", {
+          height: "360",
+          width: "640",
+          videoId: youtubeId,
+          playerVars: {
+            playsinline: 1,
+            controls: 0, // Hide default controls, use our custom ones
+          },
+          events: {
+            onReady: onPlayerReady, // Set up event when player is ready
+            onStateChange: onPlayerStateChange, // Listen for state changes
+          },
+        });
+      }
+
+      // Called when the YouTube player is ready
+      function onPlayerReady(event) {
+        event.target.playVideo(); // Start playing automatically
+        let currentVol = 5; // Set initial volume
+        event.target.setVolume(currentVol);
+        document.querySelector("#volume").value = currentVol;
+        document.querySelector("#volumeNum").textContent = currentVol;
+      }
+
+      // When the player state changes
+      function onPlayerStateChange(event) {
+        if (event.data === YT.PlayerState.ENDED) {
+          const currentVideoId = player.getVideoData().video_id;
+          fetchRecommendedVideos(currentVideoId); // Fetch related videos when the video ends
+        }
+      }
+
+      // Stop video playback
+      function stopVideo() {
+        player.stopVideo();
+      }
+
+      // Play/resume video playback
+      function playTheVideo() {
+        player.playVideo();
+      }
+
+      // --- UI Event Listeners for Custom Controls ---
+
+      // Play button
+      document.querySelector("#doplay").addEventListener("click", playTheVideo);
+      // Stop button
+      document.querySelector("#dostop").addEventListener("click", stopVideo);
+      // Pause button
+      document
+        .querySelector("#dopause")
+        .addEventListener("click", () => player.pauseVideo());
+
+      // Mute/Unmute button
+      let onMuteBtn = document.querySelector("#mute");
+      onMuteBtn.addEventListener("click", function () {
+        if (player.isMuted()) {
+          player.unMute();
+          onMuteBtn.innerText = "ミュート";
+        } else {
+          player.mute();
+          onMuteBtn.innerText = "ミュート解除";
+        }
+      });
+
+      // Seek 10 seconds backward
+      document
+        .querySelector("#do10sPrev")
+        .addEventListener("click", function () {
+          player.seekTo(player.getCurrentTime() - 10);
+        });
+
+      // Seek 10 seconds forward
+      document
+        .querySelector("#do10sNext")
+        .addEventListener("click", function () {
+          player.seekTo(player.getCurrentTime() + 10);
+        });
+
+      // Volume slider: update player volume and display numeric value
+      document.querySelector("#volume").addEventListener("change", function () {
+        let val = this.value;
+        player.setVolume(val);
+        document.querySelector("#volumeNum").textContent = val;
+      });
+
+      // Video selection dropdown: load selected video
+      document
+        .querySelector("#MovieId")
+        .addEventListener("change", function () {
+          youtubeId = this.value;
+          player.destroy(); // Destroy current player to load new video
+          onYouTubeIframeAPIReady();
+        });
+
+      // Playback speed radio buttons: set playback rate
+      document
+        .querySelector("#doSpeed")
+        .addEventListener("change", function () {
+          let speed = parseFloat(this.speed.value);
+          player.setPlaybackRate(speed);
+          player.playVideo();
+        });
+
+      // Reference to the search results dropdown
+      const selectvideo = document.querySelector(".searchlist");
+
+      // Perform a YouTube search and populate the search results dropdown
+      function ytSearch(val) {
+        // Replace with your own API key
+        const key = "AIzaSyDw-leGSYlkE_XANOa4kGGnKpYdWfaIuFE";
+        const num = 10; // Number of results to fetch
+        const part = "snippet";
+        const type = "video";
+        const maxResults = 10; // Number of results to fetch
+
+        selectvideo.innerHTML = ""; // Reset previous search results
+
+        // Fetch YouTube search results using the Data API
+        fetch(
+          `https://www.googleapis.com/youtube/v3/search?type=${type}&part=${part}&maxResults=${num}&key=${key}&q=${val}&playsinline=1`
+        )
+          .then((data) => data.json())
+          .then((obj) => {
+            console.log(obj);
+
+            if (!obj.items || obj.items.length === 0) {
+              console.log("No results found.");
+              return;
+            }
+
+            // Populate the dropdown with the video titles and IDs
+            obj.items.forEach((movie, index) => {
+              const ytId = movie.id.videoId;
+              const ytTitle = movie.snippet.title;
+              console.log(`${index + 1}: ${ytTitle}`);
+
+              const optionTag = document.createElement("option");
+              optionTag.textContent = ytTitle;
+              optionTag.setAttribute("value", ytId);
+              selectvideo.appendChild(optionTag);
+            });
+          })
+          .catch((err) => {
+            console.error("Error fetching YouTube data:", err);
+          });
+      }
+
+      // Perform a YouTube search and display results
+      function ytSearch(query) {
+        const key = "AIzaSyDw-leGSYlkE_XANOa4kGGnKpYdWfaIuFE"; // Replace with your YouTube Data API key
+        const part = "snippet";
+        const maxResults = 10; // Number of results to fetch
+        const type = "video";
+
+        fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=${part}&q=${query}&type=${type}&maxResults=${maxResults}&key=${key}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            const resultsList = document.querySelector("#resultsList");
+            const searchHeading = document.querySelector(".search__heading");
+            resultsList.innerHTML = ""; // Clear previous results
+
+            if (!data.items || data.items.length === 0) {
+              searchHeading.textContent = "No Results Found"; // Update heading if no results
+              resultsList.innerHTML = "<p>No results found.</p>";
+              return;
+            }
+
+            searchHeading.textContent = "Search Result"; // Update heading to "Search Result"
+
+            data.items.forEach((item) => {
+              const videoId = item.id.videoId;
+              const title = item.snippet.title;
+              const thumbnail = item.snippet.thumbnails.medium.url;
+
+              // Create a result card
+              const resultCard = document.createElement("div");
+              resultCard.style.cursor = "pointer";
+              resultCard.style.width = "150px";
+              resultCard.style.textAlign = "center";
+
+              resultCard.innerHTML = `
+          <img src="${thumbnail}" alt="${title}" style="width: 100%; border-radius: 8px;" />
+          <p style="font-size: 14px; margin-top: 5px;">${title}</p>
+        `;
+
+              // Add click event to play the selected video
+              resultCard.addEventListener("click", () => {
+                player.loadVideoById(videoId); // Load the selected video
+                fetchRecommendedVideos(videoId); // Fetch related videos for the selected video
+              });
+
+              resultsList.appendChild(resultCard);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching YouTube data:", error);
+          });
+      }
+
+      // Search button: perform search and display results
+      document
+        .querySelector("#searchBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault(); // Prevent form submission
+          const query = document.querySelector("#ytSearch").value;
+          ytSearch(query);
+        });
+
+      // Update the progress bar as the video plays
+      setInterval(() => {
+        if (player && player.getDuration) {
+          const currentTime = player.getCurrentTime(); // Get the current playback time
+          const duration = player.getDuration(); // Get the total duration of the video
+          const progress = (currentTime / duration) * 100; // Calculate progress percentage
+          document.querySelector("#progressBar").value = progress; // Update progress bar value
+        }
+      }, 500); // Update every 500ms for smoother progress
+
+      // Allow users to seek to a specific point in the video
+      document
+        .querySelector("#progressBar")
+        .addEventListener("input", function () {
+          const duration = player.getDuration(); // Get the total duration of the video
+          const seekTime = (this.value / 100) * duration; // Calculate the time to seek to
+          player.seekTo(seekTime); // Seek to the calculated time
+        });
+
+      // Fetch and display recommended videos
+      function fetchRecommendedVideos(videoId) {
+        const key = "AIzaSyDw-leGSYlkE_XANOa4kGGnKpYdWfaIuFE"; // Replace with your YouTube Data API key
+        const part = "snippet";
+        const maxResults = 5; // Number of recommended videos to fetch
+
+        fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=${part}&relatedToVideoId=${videoId}&type=video&maxResults=${maxResults}&key=${key}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            const videoList = document.querySelector("#videoList");
+            videoList.innerHTML = ""; // Clear previous recommendations
+
+            if (!data.items || data.items.length === 0) {
+              videoList.innerHTML = "<p>No related videos found.</p>";
+              return;
+            }
+
+            data.items.forEach((item) => {
+              const relatedVideoId = item.id.videoId;
+              const title = item.snippet.title;
+              const thumbnail = item.snippet.thumbnails.medium.url;
+
+              // Create a video card
+              const videoCard = document.createElement("div");
+              videoCard.style.cursor = "pointer";
+              videoCard.style.width = "150px";
+              videoCard.style.textAlign = "center";
+
+              videoCard.innerHTML = `
+          <img src="${thumbnail}" alt="${title}" style="width: 100%; border-radius: 8px;" />
+          <p style="font-size: 14px; margin-top: 5px;">${title}</p>
+        `;
+
+              // Add click event to play the recommended video
+              videoCard.addEventListener("click", () => {
+                player.loadVideoById(relatedVideoId); // Load the selected video
+                fetchRecommendedVideos(relatedVideoId); // Fetch new recommendations for the selected video
+              });
+
+              videoList.appendChild(videoCard);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching recommended videos:", error);
+          });
+      }
+
+      // Call this function when the player is ready or when a new video is loaded
+      document
+        .querySelector("#MovieId")
+        .addEventListener("change", function () {
+          const selectedVideoId = this.value;
+          fetchRecommendedVideos(selectedVideoId); // Load the selected video
+        });etchRecommendedVideos(selectedVideoId); // Fetch related videos
+    </script>
+  </body>
+</html>
+</html>
