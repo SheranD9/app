@@ -14,6 +14,7 @@
         background-color: #f5f5f5;
         color: #333;
         padding: 20px;
+        background-color: floralwhite;
       }
 
       #player {
@@ -55,6 +56,23 @@
         margin-right: 10px;
         display: flex;
         align-items: center;
+
+      }
+
+      li{
+        list-style: none;
+        padding: 5px 10px;
+        background-color: #1b83eb;
+        color: #000;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      label{
+        background-color: #fff;
+        padding: 5px;
+        border-radius: 6px;
+
       }
 
       form#ytSearchForm {
@@ -69,7 +87,22 @@
         font-size: 16px;
         border: 1px solid #ccc;
         border-radius: 6px;
-        width: 250px;
+
+      }
+
+      .duration {
+        margin-left: auto;
+        margin-right: auto;
+        width: 650px; /* Match the video's width */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+      }
+
+      #timeDisplay {
+        font-size: 14px;
+
       }
 
       button#searchBtn {
@@ -83,7 +116,8 @@
       }
 
       button#searchBtn:hover {
-        background-color: #005bb5;
+        background-color: #fdfdfd;
+        color: #0073e6;
       }
 
       select#MovieId,
@@ -110,6 +144,7 @@
       }
 
       #progressContainer {
+        margin-bottom: 5px; /* Reduce the bottom margin */
         margin-top: 10px;
         width: 640px; /* Match the video's width */
         margin-left: auto;
@@ -142,6 +177,10 @@
         flex-wrap: wrap;
         gap: 10px;
       }
+
+      #timeDisplay {
+        margin-top: 5px; /* Reduce the top margin */
+      }
     </style>
   </head>
 
@@ -153,27 +192,32 @@
 
     <div id="player"></div>
 
-    <div id="progressContainer" style="margin-top: 20px">
-      <input
-        type="range"
-        id="progressBar"
-        min="0"
-        max="100"
-        value="0"
-        style="width: 100%"
-      />
+    <div class="duration">
+      <div id="progressContainer" >
+        <input
+          type="range"
+          id="progressBar"
+          min="0"
+          max="100"
+          value="0"
+          style="width: 100%"
+        />
+      </div>
+      <div id="timeDisplay" ">
+        0:00 / 0:00
+      </div>
     </div>
 
     <nav>
       <ul>
-        <li id="doplay">再生</li>
-        <li id="dostop">停止</li>
-        <li id="dopause">一時停止</li>
-        <li id="mute">ミュート</li>
-        <li id="do10sNext">10秒先へ</li>
-        <li id="do10sPrev">10秒戻る</li>
+        <li id="doplay">Play</li>
+        <li id="dostop">stop</li>
+        <li id="dopause">Pause</li>
+        <li id="mute">Mute</li>
+        <li id="do10sNext">Forward</li>
+        <li id="do10sPrev">Backward</li>
         <label>
-          ボリューム<input
+         Volume<input
             type="range"
             min="0"
             max="100"
@@ -194,6 +238,7 @@
         </li>
         <li>
           <form id="doSpeed">
+            <label for="">Speed</label>
             <input type="radio" id="mslow" name="speed" value="0.25" />
             <label for="mslow">0.25</label>
             <input type="radio" id="slow" name="speed" value="0.5" />
@@ -457,10 +502,16 @@
         if (player && player.getDuration) {
           const currentTime = player.getCurrentTime(); // Get the current playback time
           const duration = player.getDuration(); // Get the total duration of the video
-          const progress = (currentTime / duration) * 100; // Calculate progress percentage
-          document.querySelector("#progressBar").value = progress; // Update progress bar value
+          document.querySelector("#timeDisplay").textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
         }
-      }, 500); // Update every 500ms for smoother progress
+      }, 500);
+
+      // Format time in minutes:seconds
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+      }
 
       // Allow users to seek to a specific point in the video
       document
