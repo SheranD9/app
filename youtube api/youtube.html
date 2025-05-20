@@ -17,6 +17,12 @@
         background-color: floralwhite;
       }
 
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
       #player {
         display: block;
         margin: 20px auto;
@@ -24,7 +30,7 @@
 
       nav {
         margin: 0 auto 0 auto;
-        width: 500px;
+        width: 550px;
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 8px;
@@ -56,10 +62,9 @@
         margin-right: 10px;
         display: flex;
         align-items: center;
-
       }
 
-      li{
+      li {
         list-style: none;
         padding: 5px 10px;
         background-color: #1b83eb;
@@ -68,11 +73,10 @@
         cursor: pointer;
       }
 
-      label{
+      label {
         background-color: #fff;
         padding: 5px;
         border-radius: 6px;
-
       }
 
       form#ytSearchForm {
@@ -87,7 +91,6 @@
         font-size: 16px;
         border: 1px solid #ccc;
         border-radius: 6px;
-
       }
 
       .duration {
@@ -97,12 +100,10 @@
         display: flex;
         align-items: center;
         gap: 10px;
-
       }
 
       #timeDisplay {
         font-size: 14px;
-
       }
 
       button#searchBtn {
@@ -116,7 +117,7 @@
       }
 
       button#searchBtn:hover {
-        background-color: #fdfdfd;
+        background-color: #989898;
         color: #0073e6;
       }
 
@@ -138,9 +139,38 @@
         margin-right: 5px;
       }
 
+      #volume {
+        appearance: none;
+        width: 100px;
+        height: 8px;
+        background: linear-gradient(to right, #0073e6 50%, #ccc 50%);
+        border-radius: 4px;
+        outline: none;
+        transition: background 0.3s;
+      }
+
+      #volume::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #0073e6;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
       form#doSpeed label {
         margin-left: 5px;
         margin-right: 10px;
+      }
+      #currentSpeed {
+        font-weight: bold;
+        color: #000000;
+        margin-left: 10px;
+      }
+      li[disabled] {
+        opacity: 0.5;
+        pointer-events: none;
       }
 
       #progressContainer {
@@ -173,51 +203,162 @@
       }
 
       #resultsList {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        justify-content: center;
+        margin-top: 10px;
+        padding: 10px;
+      }
+      .result-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .result-card img {
+        width: 100%;
+        border-radius: 6px;
+        margin-bottom: 5px;
+      }
+
+      .result-card p {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
       }
 
       #timeDisplay {
         margin-top: 5px; /* Reduce the top margin */
       }
+
+      /* Medium screen: tablets */
+      @media (max-width: 768px) {
+        nav ul {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        form#ytSearchForm {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .duration {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        #progressContainer,
+        #timeDisplay {
+          width: 100%;
+          text-align: center;
+        }
+
+        #player {
+          width: 100%;
+          max-width: 100%;
+        }
+
+        #resultsList,
+        #videoList {
+          justify-content: center;
+        }
+
+        select#MovieId,
+        input[type="search"],
+        button#searchBtn {
+          width: 100%;
+        }
+      }
+
+      /* Small screen: phones */
+      @media (max-width: 480px) {
+        #player {
+          height: auto;
+          width: 100%;
+        }
+
+        li,
+        label {
+          font-size: 14px;
+          padding: 4px 8px;
+        }
+
+        #volume {
+          width: 100%;
+        }
+
+        .search__heading {
+          font-size: 36px;
+          font-weight: bold;
+          margin-bottom: 10px;
+          text-align: center;
+          color: #0073e6;
+        }
+
+        #resultsList > div {
+          width: 100%;
+          max-width: 100%;
+        }
+      }
+
+      #player iframe {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
     </style>
   </head>
 
   <body>
-    <form>
-      <input type="search" id="ytSearch" value="TRiDENT" />
-      <button id="searchBtn">検索</button>
-    </form>
+    <div class="container">
+      <form>
+        <input type="search" id="ytSearch" value="TRiDENT" />
+        <button id="searchBtn">検索</button>
+      </form>
 
-    <div id="player"></div>
+      <div id="player"></div>
 
-    <div class="duration">
-      <div id="progressContainer" >
-        <input
-          type="range"
-          id="progressBar"
-          min="0"
-          max="100"
-          value="0"
-          style="width: 100%"
-        />
-      </div>
-      <div id="timeDisplay" ">
-        0:00 / 0:00
+      <div class="duration">
+        <div id="progressContainer">
+          <input
+            type="range"
+            id="progressBar"
+            min="0"
+            max="100"
+            value="0"
+            style="width: 100%"
+          />
+        </div>
+        <div id="timeDisplay" "> 0:00 / 0:00
       </div>
     </div>
 
     <nav>
       <ul>
         <li id="doplay">Play</li>
-        <li id="dostop">stop</li>
+        <li id="dostop" disabled>stop</li>
         <li id="dopause">Pause</li>
-        <li id="mute">Mute</li>
         <li id="do10sNext">Forward</li>
         <li id="do10sPrev">Backward</li>
-        <label>
-         Volume<input
+        <li id="mute" title="Mute/Unmute">🔊</li>
+        <label title="Volume">
+          <input
             type="range"
             min="0"
             max="100"
@@ -225,7 +366,7 @@
             id="volume"
             value="50"
           />
-          <span id="volumeNum"></span>
+          <span id="volumeNum">50</span>
         </label>
         <li>
           <select id="MovieId" class="ytMovie" name="ytMovie">
@@ -249,18 +390,19 @@
             <label for="hspeed">1.5</label>
             <input type="radio" id="mhspeed" name="speed" value="2" />
             <label for="mhspeed">2</label>
+            <span id="currentSpeed">Speed: 1x</span>
           </form>
         </li>
       </ul>
     </nav>
 
     <!-- <div id="recommendedVideos" style="margin-top: 20px">
-      <h3>Recommended Videos</h3>
-      <div
-        id="videoList"
-        style="display: flex; flex-wrap: wrap; gap: 10px"
-      ></div>
-    </div> -->
+        <h3>Recommended Videos</h3>
+        <div
+          id="videoList"
+          style="display: flex; flex-wrap: wrap; gap: 10px"
+        ></div>
+      </div> -->
 
     <div id="searchResults" style="margin-top: 20px">
       <h3 class="search__heading"></h3>
@@ -269,8 +411,6 @@
         style="display: flex; flex-wrap: wrap; gap: 10px"
       ></div>
     </div>
-
-    <!-- <select class="searchlist"></select> -->
 
     <script>
       // Dynamically load the YouTube IFrame Player API script
@@ -312,9 +452,16 @@
 
       // When the player state changes
       function onPlayerStateChange(event) {
+        const stopBtn = document.querySelector("#dostop");
+        if (event.data === YT.PlayerState.PLAYING) {
+          stopBtn.removeAttribute("disabled");
+        } else {
+          stopBtn.setAttribute("disabled", "true");
+        }
+
         if (event.data === YT.PlayerState.ENDED) {
           const currentVideoId = player.getVideoData().video_id;
-          fetchRecommendedVideos(currentVideoId); // Fetch related videos when the video ends
+          fetchRecommendedVideos(currentVideoId);
         }
       }
 
@@ -340,14 +487,14 @@
         .addEventListener("click", () => player.pauseVideo());
 
       // Mute/Unmute button
-      let onMuteBtn = document.querySelector("#mute");
+      const onMuteBtn = document.querySelector("#mute");
       onMuteBtn.addEventListener("click", function () {
         if (player.isMuted()) {
           player.unMute();
-          onMuteBtn.innerText = "ミュート";
+          onMuteBtn.innerText = "🔊";
         } else {
           player.mute();
-          onMuteBtn.innerText = "ミュート解除";
+          onMuteBtn.innerText = "🔇";
         }
       });
 
@@ -366,11 +513,40 @@
         });
 
       // Volume slider: update player volume and display numeric value
-      document.querySelector("#volume").addEventListener("change", function () {
-        let val = this.value;
-        player.setVolume(val);
-        document.querySelector("#volumeNum").textContent = val;
+      document.querySelector("#volume").addEventListener("wheel", function (e) {
+        e.preventDefault();
+        let delta = e.deltaY < 0 ? 5 : -5;
+        let newVal = Math.min(100, Math.max(0, parseInt(this.value) + delta));
+        this.value = newVal;
+        player.setVolume(newVal);
+        document.querySelector("#volumeNum").textContent = newVal;
       });
+
+      const volumeSlider = document.querySelector("#volume");
+      const updateVolumeBar = () => {
+        const val = volumeSlider.value;
+        volumeSlider.style.background = `linear-gradient(to right, #0073e6 ${val}%, #ccc ${val}%)`;
+      };
+
+      volumeSlider.addEventListener("input", () => {
+        player.setVolume(volumeSlider.value);
+        document.querySelector("#volumeNum").textContent = volumeSlider.value;
+        updateVolumeBar();
+      });
+
+      volumeSlider.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        let delta = e.deltaY < 0 ? 5 : -5;
+        let newVal = Math.min(
+          100,
+          Math.max(0, parseInt(volumeSlider.value) + delta)
+        );
+        volumeSlider.value = newVal;
+        player.setVolume(newVal);
+        document.querySelector("#volumeNum").textContent = newVal;
+        updateVolumeBar();
+      });
+      updateVolumeBar();
 
       // Video selection dropdown: load selected video
       document
@@ -388,6 +564,23 @@
           let speed = parseFloat(this.speed.value);
           player.setPlaybackRate(speed);
           player.playVideo();
+
+          // Update current speed display
+          document.querySelector(
+            "#currentSpeed"
+          ).textContent = `Speed: ${speed}x`;
+
+          // Highlight selected speed
+          document.querySelectorAll("#doSpeed label").forEach((label) => {
+            label.style.fontWeight = "normal";
+            label.style.color = "#000";
+          });
+          this.querySelector(
+            `input[value="${speed}"]`
+          ).nextElementSibling.style.fontWeight = "bold";
+          this.querySelector(
+            `input[value="${speed}"]`
+          ).nextElementSibling.style.color = "#0073e6";
         });
 
       // Reference to the search results dropdown
@@ -465,9 +658,7 @@
 
               // Create a result card
               const resultCard = document.createElement("div");
-              resultCard.style.cursor = "pointer";
-              resultCard.style.width = "150px";
-              resultCard.style.textAlign = "center";
+              resultCard.className = "result-card";
 
               resultCard.innerHTML = `
           <img src="${thumbnail}" alt="${title}" style="width: 100%; border-radius: 8px;" />
@@ -502,7 +693,9 @@
         if (player && player.getDuration) {
           const currentTime = player.getCurrentTime(); // Get the current playback time
           const duration = player.getDuration(); // Get the total duration of the video
-          document.querySelector("#timeDisplay").textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+          document.querySelector("#timeDisplay").textContent = `${formatTime(
+            currentTime
+          )} / ${formatTime(duration)}`;
         }
       }, 500);
 
@@ -577,8 +770,8 @@
         .addEventListener("change", function () {
           const selectedVideoId = this.value;
           fetchRecommendedVideos(selectedVideoId); // Load the selected video
-        });etchRecommendedVideos(selectedVideoId); // Fetch related videos
+        });
+      etchRecommendedVideos(selectedVideoId); // Fetch related videos
     </script>
   </body>
-</html>
 </html>
